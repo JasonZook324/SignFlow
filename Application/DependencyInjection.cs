@@ -9,7 +9,8 @@ public static class DependencyInjection
     {
         services.AddScoped<PricingService>();
         services.AddScoped<PdfService>();
-        services.AddScoped<SigningTokenService>(); // signing tokens
+        services.AddScoped<SigningTokenService>();
+        services.AddScoped<AuditService>();
         return services;
     }
 }

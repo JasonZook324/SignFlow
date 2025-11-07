@@ -10,7 +10,8 @@ public class SignIndexModel : PageModel
 {
     private readonly AppDbContext _db;
     private readonly SigningTokenService _tokens;
-    public SignIndexModel(AppDbContext db, SigningTokenService tokens) { _db = db; _tokens = tokens; }
+    private readonly AuditService _audit;
+    public SignIndexModel(AppDbContext db, SigningTokenService tokens, AuditService audit) { _db = db; _tokens = tokens; _audit = audit; }
 
     [BindProperty(SupportsGet = true)]
     public string Token { get; set; } = string.Empty;
@@ -41,6 +42,15 @@ public class SignIndexModel : PageModel
         if (Proposal == null)
         {
             Error = "Proposal not found.";
+        }
+        else
+        {
+            await _audit.WriteAsync(Proposal.OrganizationId, nameof(Proposal), Proposal.Id, "PublicViewed", new
+            {
+                Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Ua = Request.Headers.UserAgent.ToString(),
+                Token = token.Token
+            });
         }
         return Page();
     }
@@ -77,6 +87,15 @@ public class SignIndexModel : PageModel
         proposal.SignedUtc = DateTime.UtcNow;
         await _tokens.MarkUsedAsync(token);
         await _db.SaveChangesAsync();
+
+        await _audit.WriteAsync(proposal.OrganizationId, nameof(Proposal), proposal.Id, "Signed", new
+        {
+            Input.SignerName,
+            Input.SignerEmail,
+            Ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            Ua = Request.Headers.UserAgent.ToString()
+        });
+
         return RedirectToPage("/Proposals/View", new { id = proposal.Id });
     }
 }
