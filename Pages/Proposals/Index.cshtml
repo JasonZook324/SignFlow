@@ -1,0 +1,22 @@
+@page
+@model ProposalsIndexModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Proposals";
+}
+<h2>Proposals</h2>
+<p><a class="btn btn-primary" asp-page="Create">New Proposal</a></p>
+<table class="table table-sm table-striped">
+    <thead><tr><th>Title</th><th>Status</th><th>Total</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model.Items)
+    {
+        <tr>
+            <td>@p.Title</td>
+            <td>@p.Status</td>
+            <td>@p.GrandTotal.ToString("C")</td>
+            <td><a asp-page="View" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">View</a> <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

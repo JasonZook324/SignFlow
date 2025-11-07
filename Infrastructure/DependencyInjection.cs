@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SignFlow.Application.Options;
+using SignFlow.Infrastructure.Email;
 using SignFlow.Infrastructure.Persistence;
 
 namespace SignFlow.Infrastructure;
@@ -34,6 +35,10 @@ public static class DependencyInjection
 
         services.AddOptions<StripeOptions>().Bind(config.GetSection(StripeOptions.SectionName));
         services.AddOptions<StorageOptions>().Bind(config.GetSection(StorageOptions.SectionName));
+        services.AddOptions<EmailOptions>().Bind(config.GetSection(EmailOptions.SectionName));
+
+        services.AddScoped<IEmailSender, SendGridEmailSender>();
+        services.AddHostedService<DevSeederHostedService>();
         return services;
     }
 }

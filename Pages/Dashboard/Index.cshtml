@@ -1,0 +1,37 @@
+@page
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@model DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<h2>Dashboard</h2>
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="p-3 border rounded">
+            <div class="text-muted">Clients</div>
+            <div class="display-6">@Model.ClientCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 border rounded">
+            <div class="text-muted">Draft Proposals</div>
+            <div class="display-6">@Model.DraftCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 border rounded">
+            <div class="text-muted">Sent</div>
+            <div class="display-6">@Model.SentCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 border rounded">
+            <div class="text-muted">Signed</div>
+            <div class="display-6">@Model.SignedCount</div>
+        </div>
+    </div>
+</div>
+<p class="mt-4">
+    <a class="btn btn-primary" asp-page="/Clients/Index">Manage Clients</a>
+    <a class="btn btn-outline-primary" asp-page="/Clients/Create">New Client</a>
+</p>

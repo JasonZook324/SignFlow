@@ -1,0 +1,59 @@
+@page
+@model ProposalCreateModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Create Proposal";
+}
+<h2>Create Proposal</h2>
+<form method="post" class="mt-3">
+    <div class="mb-3">
+        <label asp-for="Input.Title" class="form-label"></label>
+        <input asp-for="Input.Title" class="form-control" />
+        <span asp-validation-for="Input.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Currency" class="form-label"></label>
+        <input asp-for="Input.Currency" class="form-control" />
+        <span asp-validation-for="Input.Currency" class="text-danger"></span>
+    </div>
+    <fieldset class="border p-3 mb-3">
+        <legend class="fs-6">Line Items</legend>
+        <div id="items">
+            @for (int i = 0; i < Model.Input.Items.Count; i++)
+            {
+                <div class="row g-2 mb-2">
+                    <div class="col-md-5">
+                        <input asp-for="Input.Items[i].Description" class="form-control" placeholder="Description" />
+                    </div>
+                    <div class="col-md-2">
+                        <input asp-for="Input.Items[i].Quantity" class="form-control" placeholder="Qty" />
+                    </div>
+                    <div class="col-md-2">
+                        <input asp-for="Input.Items[i].UnitPrice" class="form-control" placeholder="Unit Price" />
+                    </div>
+                    <div class="col-md-1 form-check">
+                        <input asp-for="Input.Items[i].Taxable" class="form-check-input" />
+                        <label asp-for="Input.Items[i].Taxable" class="form-check-label">Tax</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input asp-for="Input.Items[i].DiscountRate" class="form-control" placeholder="Disc %" />
+                    </div>
+                </div>
+            }
+        </div>
+    </fieldset>
+    <div class="mb-3">
+        <label class="form-label">Tax Rate (%)</label>
+        <input asp-for="Input.TaxRate" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <strong>Calculated Total:</strong>
+        <div>Subtotal: @Model.Calculation.Subtotal.ToString("C")</div>
+        <div>Tax: @Model.Calculation.TaxTotal.ToString("C")</div>
+        <div>Discounts: @Model.Calculation.DiscountTotal.ToString("C")</div>
+        <div>Grand: @Model.Calculation.GrandTotal.ToString("C")</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

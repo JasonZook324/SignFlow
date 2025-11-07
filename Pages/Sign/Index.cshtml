@@ -1,0 +1,30 @@
+@page "{token}"
+@model SignIndexModel
+@{
+    ViewData["Title"] = "Sign Proposal";
+}
+<h2>Sign Proposal</h2>
+@if (Model.Error != null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+else if (Model.Proposal != null)
+{
+    <p>Proposal: <strong>@Model.Proposal.Title</strong></p>
+    <p>Total: @Model.Proposal.GrandTotal.ToString("C")</p>
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Input.SignerName" class="form-label"></label>
+            <input asp-for="Input.SignerName" class="form-control" />
+            <span asp-validation-for="Input.SignerName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.SignerEmail" class="form-label"></label>
+            <input asp-for="Input.SignerEmail" class="form-control" />
+            <span asp-validation-for="Input.SignerEmail" class="text-danger"></span>
+        </div>
+        <p>Signature (type name acts as signature placeholder for MVP)</p>
+        <button class="btn btn-success" type="submit">Sign</button>
+    </form>
+}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

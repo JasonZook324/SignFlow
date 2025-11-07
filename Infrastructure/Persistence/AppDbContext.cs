@@ -18,6 +18,7 @@ public class AppDbContext : IdentityDbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
+    public DbSet<SigningToken> SigningTokens => Set<SigningToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,5 +26,6 @@ public class AppDbContext : IdentityDbContext
         modelBuilder.Entity<Proposal>().HasIndex(p => new { p.OrganizationId, p.Status });
         modelBuilder.Entity<Client>().HasIndex(c => new { c.OrganizationId, c.Name });
         modelBuilder.Entity<Payment>().HasIndex(p => p.ProposalId);
+        modelBuilder.Entity<SigningToken>().HasIndex(t => t.Token).IsUnique();
     }
 }
