@@ -5,7 +5,7 @@ using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
 
-[Authorize]
+[Authorize(Policy = "OrgMember")]
 public class ProposalsIndexModel : PageModel
 {
     private readonly AppDbContext _db;

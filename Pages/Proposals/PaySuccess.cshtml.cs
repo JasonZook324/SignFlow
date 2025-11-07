@@ -5,7 +5,7 @@ using SignFlow.Infrastructure.Persistence;
 using SignFlow.Domain.Entities;
 using SignFlow.Application.Services;
 
-[Authorize]
+[Authorize(Policy = "OrgMember")]
 public class ProposalPaySuccessModel : PageModel
 {
     private readonly AppDbContext _db;

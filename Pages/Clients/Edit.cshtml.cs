@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
+using SignFlow.Application.Services;
 
-[Authorize]
+[Authorize(Policy = "OrgMember")]
 public class ClientEditModel : PageModel
 {
     private readonly AppDbContext _db;
-    public ClientEditModel(AppDbContext db) { _db = db; }
+    private readonly ICurrentOrganization _org;
+    public ClientEditModel(AppDbContext db, ICurrentOrganization org) { _db = db; _org = org; }
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -29,6 +31,7 @@ public class ClientEditModel : PageModel
     {
         var c = await _db.Clients.FirstOrDefaultAsync(x => x.Id == id);
         if (c == null) return NotFound();
+        if (_org.OrganizationId == null || c.OrganizationId != _org.OrganizationId.Value) return Forbid();
         Input = new InputModel { Id = c.Id, Name = c.Name, Email = c.Email, Phone = c.Phone };
         return Page();
     }
@@ -38,6 +41,7 @@ public class ClientEditModel : PageModel
         if (!ModelState.IsValid) return Page();
         var c = await _db.Clients.FirstOrDefaultAsync(x => x.Id == Input.Id);
         if (c == null) return NotFound();
+        if (_org.OrganizationId == null || c.OrganizationId != _org.OrganizationId.Value) return Forbid();
         c.Name = Input.Name; c.Email = Input.Email; c.Phone = Input.Phone;
         await _db.SaveChangesAsync();
         return RedirectToPage("Index");

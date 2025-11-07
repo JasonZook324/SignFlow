@@ -7,7 +7,7 @@ using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
 using Microsoft.EntityFrameworkCore;
 
-[Authorize]
+[Authorize(Policy = "OrgMember")]
 public class ProposalCreateModel : PageModel
 {
     private readonly AppDbContext _db;
