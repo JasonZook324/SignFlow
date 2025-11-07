@@ -1,0 +1,10 @@
+@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "Logout";
+}
+<form method="post">
+    <p>Are you sure you want to log out?</p>
+    <button class="btn btn-danger" type="submit">Logout</button>
+    <a asp-page="/Index" class="btn btn-secondary">Cancel</a>
+</form>
