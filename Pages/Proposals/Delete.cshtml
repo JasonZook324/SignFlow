@@ -1,0 +1,17 @@
+@page "{id:guid}"
+@model ProposalDeleteModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "OrgOwner")]
+@{
+    ViewData["Title"] = "Delete Proposal";
+}
+<h2>Delete Proposal</h2>
+@if (Model.Proposal != null)
+{
+    <div class="alert alert-warning">
+        Are you sure you want to delete proposal <strong>@Model.Proposal.Title</strong>?
+    </div>
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-page="View" asp-route-id="@Model.Proposal.Id" class="btn btn-secondary">Cancel</a>
+    </form>
+}
