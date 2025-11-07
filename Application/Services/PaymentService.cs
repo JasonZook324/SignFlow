@@ -3,15 +3,17 @@ using Stripe.Checkout;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using SignFlow.Application.Services; // for AuditService
 
 namespace SignFlow.Application.Services;
 
 public class PaymentService
 {
     private readonly AppDbContext _db;
-    public PaymentService(AppDbContext db)
+    private readonly AuditService _audit;
+    public PaymentService(AppDbContext db, AuditService audit)
     {
-        _db = db;
+        _db = db; _audit = audit;
     }
 
     public async Task<Session> CreateCheckoutSessionAsync(Proposal proposal, string successUrl, string cancelUrl)
@@ -46,6 +48,14 @@ public class PaymentService
         };
         var service = new SessionService();
         var session = await service.CreateAsync(options);
+
+        // Audit checkout creation
+        await _audit.WriteAsync(proposal.OrganizationId, nameof(Proposal), proposal.Id, "CheckoutCreated", new
+        {
+            session.Id,
+            proposal.GrandTotal,
+            proposal.Currency
+        });
 
         _db.Payments.Add(new Payment
         {
