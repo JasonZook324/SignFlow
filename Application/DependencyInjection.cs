@@ -12,6 +12,8 @@ public static class DependencyInjection
         services.AddScoped<SigningTokenService>();
         services.AddScoped<AuditService>();
         services.AddScoped<PaymentService>();
+        services.AddScoped<CurrentOrganization>();
+        services.AddScoped<ICurrentOrganization>(sp => sp.GetRequiredService<CurrentOrganization>());
         return services;
     }
 }

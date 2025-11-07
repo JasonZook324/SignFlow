@@ -16,6 +16,13 @@
         <input asp-for="Input.Currency" class="form-control" />
         <span asp-validation-for="Input.Currency" class="text-danger"></span>
     </div>
+    <div class="mb-3">
+        <label asp-for="Input.ClientId" class="form-label">Client</label>
+        <select asp-for="Input.ClientId" class="form-select" asp-items="@(new SelectList(Model.AvailableClients, nameof(SignFlow.Domain.Entities.Client.Id), nameof(SignFlow.Domain.Entities.Client.Name)))">
+            <option value="">-- Select Client --</option>
+        </select>
+        <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+    </div>
     <fieldset class="border p-3 mb-3">
         <legend class="fs-6">Line Items</legend>
         <div id="items">

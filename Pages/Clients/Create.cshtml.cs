@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
+using SignFlow.Application.Services;
 
 [Authorize]
 public class ClientCreateModel : PageModel
 {
     private readonly AppDbContext _db;
-    public ClientCreateModel(AppDbContext db) { _db = db; }
+    private readonly ICurrentOrganization _org;
+    public ClientCreateModel(AppDbContext db, ICurrentOrganization org) { _db = db; _org = org; }
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -28,13 +30,18 @@ public class ClientCreateModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        if (_org.OrganizationId == null)
+        {
+            ModelState.AddModelError(string.Empty, "No organization context.");
+            return Page();
+        }
         var client = new Client
         {
             Id = Guid.NewGuid(),
             Name = Input.Name,
             Email = Input.Email,
             Phone = Input.Phone,
-            OrganizationId = Guid.Empty // TODO: Replace with current org context
+            OrganizationId = _org.OrganizationId.Value
         };
         _db.Clients.Add(client);
         await _db.SaveChangesAsync();

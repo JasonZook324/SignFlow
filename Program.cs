@@ -1,6 +1,7 @@
 using SignFlow.Infrastructure;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application;
+using SignFlow.Application.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -55,6 +56,7 @@ app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCurrentOrganization();
 
 app.MapRazorPages();
 

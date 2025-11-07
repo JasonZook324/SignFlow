@@ -5,21 +5,24 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
+using Microsoft.EntityFrameworkCore;
 
 [Authorize]
 public class ProposalCreateModel : PageModel
 {
     private readonly AppDbContext _db;
     private readonly PricingService _pricing;
-    public ProposalCreateModel(AppDbContext db, PricingService pricing)
+    private readonly ICurrentOrganization _org;
+    public ProposalCreateModel(AppDbContext db, PricingService pricing, ICurrentOrganization org)
     {
-        _db = db; _pricing = pricing;
+        _db = db; _pricing = pricing; _org = org;
     }
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
     public (decimal Subtotal, decimal TaxTotal, decimal DiscountTotal, decimal GrandTotal) Calculation { get; set; }
+    public List<Client> AvailableClients { get; set; } = new();
 
     public class ItemModel
     {
@@ -39,23 +42,38 @@ public class ProposalCreateModel : PageModel
         public List<ItemModel> Items { get; set; } = new() { new ItemModel(), new ItemModel() };
         [Range(0, 100)]
         public decimal TaxRate { get; set; } = 0m;
+        [Required]
+        public Guid ClientId { get; set; }
     }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
+        if (_org.OrganizationId == null)
+        {
+            ModelState.AddModelError(string.Empty, "No organization context.");
+            return Page();
+        }
+        AvailableClients = await _db.Clients.Where(c => c.OrganizationId == _org.OrganizationId).OrderBy(c => c.Name).ToListAsync();
         Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (_org.OrganizationId == null)
+        {
+            ModelState.AddModelError(string.Empty, "No organization context.");
+            return Page();
+        }
+        AvailableClients = await _db.Clients.Where(c => c.OrganizationId == _org.OrganizationId).OrderBy(c => c.Name).ToListAsync();
         Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
         if (!ModelState.IsValid) return Page();
 
         var proposal = new Proposal
         {
             Id = Guid.NewGuid(),
-            OrganizationId = Guid.Empty, // TODO: org context
-            ClientId = Guid.Empty, // TODO: selected client
+            OrganizationId = _org.OrganizationId.Value,
+            ClientId = Input.ClientId,
             Title = Input.Title,
             Currency = Input.Currency,
             Status = ProposalStatus.Draft,
