@@ -1,0 +1,16 @@
+@page "{id:guid}"
+@model ProposalPayModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Pay Proposal";
+}
+<h2>Pay Proposal</h2>
+@if (Model.Proposal != null)
+{
+    <p>Proposal: <strong>@Model.Proposal.Title</strong></p>
+    <p>Amount: <strong>@Model.Proposal.GrandTotal.ToString("C")</strong> (@Model.Proposal.Currency)</p>
+    <form method="post">
+        <button type="submit" class="btn btn-success">Proceed to Checkout</button>
+        <a asp-page="View" asp-route-id="@Model.Proposal.Id" class="btn btn-secondary">Cancel</a>
+    </form>
+}

@@ -1,0 +1,13 @@
+@page "{id:guid}"
+@model ProposalPaySuccessModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Payment Success";
+}
+<h2>Payment Successful</h2>
+@if (Model.Proposal != null)
+{
+    <p>Payment recorded for proposal <strong>@Model.Proposal.Title</strong>.</p>
+    <p>Total Paid: <strong>@Model.Proposal.GrandTotal.ToString("C")</strong></p>
+    <a asp-page="View" asp-route-id="@Model.Proposal.Id" class="btn btn-primary">Back to Proposal</a>
+}
