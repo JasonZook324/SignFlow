@@ -15,10 +15,11 @@ public class ProposalViewModel : PageModel
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _config;
     private readonly AuditService _audit;
+    private readonly ICurrentOrganization _org;
 
-    public ProposalViewModel(AppDbContext db, SigningTokenService tokens, IEmailSender emailSender, IConfiguration config, AuditService audit)
+    public ProposalViewModel(AppDbContext db, SigningTokenService tokens, IEmailSender emailSender, IConfiguration config, AuditService audit, ICurrentOrganization org)
     {
-        _db = db; _tokens = tokens; _emailSender = emailSender; _config = config; _audit = audit;
+        _db = db; _tokens = tokens; _emailSender = emailSender; _config = config; _audit = audit; _org = org;
     }
 
     public Proposal? Proposal { get; set; }
@@ -27,31 +28,32 @@ public class ProposalViewModel : PageModel
     public List<AuditEvent> AuditEvents { get; set; } = new();
     public Payment? LatestPayment { get; set; }
 
-    public async Task OnGetAsync(Guid id)
+    public async Task<IActionResult> OnGetAsync(Guid id)
     {
         Proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
-        if (Proposal != null)
-        {
-            Items = await _db.ProposalItems.Where(i => i.ProposalId == id).OrderBy(i => i.SortOrder).ToListAsync();
-            AuditEvents = await _db.AuditEvents
-                .Where(a => a.EntityType == nameof(Proposal) && a.EntityId == id)
-                .OrderByDescending(a => a.CreatedUtc)
-                .Take(50)
-                .ToListAsync();
-            LatestPayment = await _db.Payments.Where(p => p.ProposalId == id)
-                .OrderByDescending(p => p.PaidUtc ?? DateTime.MinValue)
-                .ThenByDescending(p => p.Id)
-                .FirstOrDefaultAsync();
-        }
+        if (Proposal == null) return NotFound();
+        if (_org.OrganizationId == null || Proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
+        Items = await _db.ProposalItems.Where(i => i.ProposalId == id).OrderBy(i => i.SortOrder).ToListAsync();
+        AuditEvents = await _db.AuditEvents
+            .Where(a => a.EntityType == nameof(Proposal) && a.EntityId == id)
+            .OrderByDescending(a => a.CreatedUtc)
+            .Take(50)
+            .ToListAsync();
+        LatestPayment = await _db.Payments.Where(p => p.ProposalId == id)
+            .OrderByDescending(p => p.PaidUtc ?? DateTime.MinValue)
+            .ThenByDescending(p => p.Id)
+            .FirstOrDefaultAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnPostSendAsync(Guid id)
     {
         Proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
         if (Proposal == null) return NotFound();
+        if (_org.OrganizationId == null || Proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
         Items = await _db.ProposalItems.Where(i => i.ProposalId == id).OrderBy(i => i.SortOrder).ToListAsync();
 
-        var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == Proposal.ClientId);
+        var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == Proposal.ClientId && c.OrganizationId == _org.OrganizationId.Value);
         if (client == null)
         {
             ModelState.AddModelError(string.Empty, "Client not found for proposal.");

@@ -9,20 +9,19 @@ using SignFlow.Application.Services;
 public class ProposalPaySuccessModel : PageModel
 {
     private readonly AppDbContext _db;
+    private readonly ICurrentOrganization _org;
 
-    public ProposalPaySuccessModel(AppDbContext db) { _db = db; }
+    public ProposalPaySuccessModel(AppDbContext db, ICurrentOrganization org) { _db = db; _org = org; }
 
     public Proposal? Proposal { get; set; }
 
     public async Task OnGetAsync(Guid id)
     {
-        // Mark proposal as paid if any succeeded payment is recorded (webhook should be source of truth later)
         Proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
-        if (Proposal != null)
-        {
-            Proposal.Status = ProposalStatus.Paid;
-            Proposal.PaidUtc = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
-        }
+        if (Proposal == null) return;
+        if (_org.OrganizationId == null || Proposal.OrganizationId != _org.OrganizationId.Value) { Proposal = null; return; }
+        Proposal.Status = ProposalStatus.Paid;
+        Proposal.PaidUtc = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
     }
 }

@@ -12,7 +12,8 @@ public class ProposalEditModel : PageModel
 {
     private readonly AppDbContext _db;
     private readonly PricingService _pricing;
-    public ProposalEditModel(AppDbContext db, PricingService pricing) { _db = db; _pricing = pricing; }
+    private readonly ICurrentOrganization _org;
+    public ProposalEditModel(AppDbContext db, PricingService pricing, ICurrentOrganization org) { _db = db; _pricing = pricing; _org = org; }
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -44,6 +45,7 @@ public class ProposalEditModel : PageModel
     {
         var proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
         if (proposal == null) return NotFound();
+        if (_org.OrganizationId == null || proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
         var items = await _db.ProposalItems.Where(i => i.ProposalId == id).OrderBy(i => i.SortOrder).ToListAsync();
         Input = new InputModel
         {
@@ -67,10 +69,11 @@ public class ProposalEditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
-        if (!ModelState.IsValid) return Page();
         var proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == Input.Id);
         if (proposal == null) return NotFound();
+        if (_org.OrganizationId == null || proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
+        Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
+        if (!ModelState.IsValid) return Page();
         proposal.Title = Input.Title;
         proposal.Currency = Input.Currency;
         proposal.Subtotal = Calculation.Subtotal;
