@@ -9,12 +9,20 @@
 {
     <p>Status: <strong>@Model.Proposal.Status</strong></p>
     <form method="post" asp-page-handler="Send" class="mb-3">
-        <button class="btn btn-sm btn-primary" type="submit" @(Model.Proposal.Status == SignFlow.Domain.Entities.ProposalStatus.Signed ? "disabled" : null)>Send Signing Link</button>
+        <button class="btn btn-sm btn-primary" type="submit" @(Model.Proposal.Status == SignFlow.Domain.Entities.ProposalStatus.Signed ? "" : null)>Send Signing Link</button>
         @if (Model.SigningLink != null)
         {
             <span class="ms-2">Link: <a href="@Model.SigningLink" target="_blank">@Model.SigningLink</a></span>
         }
     </form>
+    @if (Model.Proposal.Status == SignFlow.Domain.Entities.ProposalStatus.Signed && (Model.LatestPayment == null || Model.LatestPayment.Status != SignFlow.Domain.Entities.PaymentStatus.Succeeded))
+    {
+        <p><a class="btn btn-success btn-sm" asp-page="Pay" asp-route-id="@Model.Proposal.Id">Pay Now</a></p>
+    }
+    @if (Model.LatestPayment?.Status == SignFlow.Domain.Entities.PaymentStatus.Succeeded)
+    {
+        <div class="alert alert-success p-2">Payment succeeded @Model.LatestPayment.PaidUtc?.ToLocalTime() @if(Model.LatestPayment.ReceiptUrl!=null){<span>- <a href="@Model.LatestPayment.ReceiptUrl" target="_blank">Receipt</a></span>}</div>
+    }
     <div class="row g-4">
         <div class="col-md-8">
             <table class="table table-sm">

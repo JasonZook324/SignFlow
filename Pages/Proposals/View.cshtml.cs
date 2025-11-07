@@ -25,6 +25,7 @@ public class ProposalViewModel : PageModel
     public List<ProposalItem> Items { get; set; } = new();
     public string? SigningLink { get; set; }
     public List<AuditEvent> AuditEvents { get; set; } = new();
+    public Payment? LatestPayment { get; set; }
 
     public async Task OnGetAsync(Guid id)
     {
@@ -37,6 +38,10 @@ public class ProposalViewModel : PageModel
                 .OrderByDescending(a => a.CreatedUtc)
                 .Take(50)
                 .ToListAsync();
+            LatestPayment = await _db.Payments.Where(p => p.ProposalId == id)
+                .OrderByDescending(p => p.PaidUtc ?? DateTime.MinValue)
+                .ThenByDescending(p => p.Id)
+                .FirstOrDefaultAsync();
         }
     }
 
@@ -82,6 +87,10 @@ public class ProposalViewModel : PageModel
         });
 
         await LoadAuditAsync(id);
+        LatestPayment = await _db.Payments.Where(p => p.ProposalId == id)
+            .OrderByDescending(p => p.PaidUtc ?? DateTime.MinValue)
+            .ThenByDescending(p => p.Id)
+            .FirstOrDefaultAsync();
         return Page();
     }
 
