@@ -1,9 +1,6 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@*
-  Minimal layout for Razor Pages starter
-*@
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,11 +13,16 @@
     <div class="container py-4">
         <header class="mb-4 d-flex justify-content-between align-items-center">
             <h2 class="m-0"><a class="text-decoration-none" href="/">SignFlow</a></h2>
-            <nav>
+            <nav class="d-flex align-items-center gap-2">
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <span class="me-2">@User.Identity?.Name</span>
-                    <a class="btn btn-outline-secondary btn-sm" asp-page="/Account/Logout">Logout</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Dashboard/Index">Dashboard</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Clients/Index">Clients</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Proposals/Index">Proposals</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Organization/Settings" asp-authorize asp-policy="OrgOwner">Org Settings</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Organization/Members" asp-authorize asp-policy="OrgOwner">Members</a>
+                    <span class="ms-2">@User.Identity?.Name</span>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Account/Logout">Logout</a>
                 }
                 else
                 {

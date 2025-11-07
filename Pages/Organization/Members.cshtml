@@ -1,0 +1,57 @@
+@page
+@model OrgMembersModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "OrgOwner")]
+@{
+    ViewData["Title"] = "Organization Members";
+}
+<h2>Organization Members</h2>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+<div class="row g-4">
+    <div class="col-md-6">
+        <h5>Current Members</h5>
+        <table class="table table-sm table-striped">
+            <thead><tr><th>Email</th><th>Role</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var m in Model.Members)
+            {
+                <tr>
+                    <td>@m.Email</td>
+                    <td>@m.Role</td>
+                    <td>
+                        @if (m.Role != "Owner")
+                        {
+                            <form method="post" asp-page-handler="Remove" class="d-inline">
+                                <input type="hidden" name="userId" value="@m.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h5>Invite Member</h5>
+        <form method="post" asp-page-handler="Invite">
+            <div class="mb-3">
+                <label asp-for="Invite.Email" class="form-label">Email</label>
+                <input asp-for="Invite.Email" class="form-control" />
+                <span asp-validation-for="Invite.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Invite.Role" class="form-label">Role</label>
+                <select asp-for="Invite.Role" class="form-select">
+                    <option value="Member">Member</option>
+                    <option value="Owner">Owner</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Invite</button>
+        </form>
+        <p class="text-muted small mt-2">If the email doesn't have an account, one will be created and notified.</p>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
