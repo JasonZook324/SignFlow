@@ -1,6 +1,7 @@
 @page
 @model ProposalsIndexModel
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using SignFlow.Domain.Entities
 @{
     ViewData["Title"] = "Proposals";
 }
@@ -16,9 +17,22 @@
     {
         <tr>
             <td>@p.Title</td>
-            <td>@p.Status</td>
+            <td>
+                @p.Status
+                @if (p.IsDeleted)
+                {
+                    <span class="badge rounded-pill text-bg-danger ms-2">Deleted</span>
+                }
+                else if (p.Status == ProposalStatus.Archived)
+                {
+                    <span class="badge rounded-pill text-bg-warning text-dark ms-2">Archived</span>
+                }
+            </td>
             <td>@p.GrandTotal.ToString("C")</td>
-            <td><a asp-page="View" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">View</a> <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a></td>
+            <td>
+                <a asp-page="View" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+            </td>
         </tr>
     }
     </tbody>
