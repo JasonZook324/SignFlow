@@ -5,7 +5,10 @@
     ViewData["Title"] = "Proposals";
 }
 <h2>Proposals</h2>
-<p><a class="btn btn-primary" asp-page="Create">New Proposal</a></p>
+<p>
+    <a class="btn btn-primary" asp-page="Create">New Proposal</a>
+    <a class="btn btn-outline-secondary" asp-page="Archived">Archived/Deleted</a>
+</p>
 <table class="table table-sm table-striped">
     <thead><tr><th>Title</th><th>Status</th><th>Total</th><th></th></tr></thead>
     <tbody>
