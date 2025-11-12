@@ -18,12 +18,14 @@ public class AppDbContext : IdentityDbContext
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
     public DbSet<SigningToken> SigningTokens => Set<SigningToken>();
+    public DbSet<ProposalTemplate> ProposalTemplates => Set<ProposalTemplate>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Proposal>().HasIndex(p => new { p.OrganizationId, p.Status });
-        modelBuilder.Entity<Client>().HasIndex(c => new { c.OrganizationId, c.Name });
+        // Updated composite indexes including IsDeleted for query perf
+        modelBuilder.Entity<Proposal>().HasIndex(p => new { p.OrganizationId, p.Status, p.IsDeleted });
+        modelBuilder.Entity<Client>().HasIndex(c => new { c.OrganizationId, c.Name, c.IsDeleted });
         modelBuilder.Entity<Payment>().HasIndex(p => p.ProposalId);
         modelBuilder.Entity<SigningToken>().HasIndex(t => t.Token).IsUnique();
 
