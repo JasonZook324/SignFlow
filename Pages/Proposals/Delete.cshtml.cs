@@ -12,7 +12,8 @@ public class ProposalDeleteModel : PageModel
 {
     private readonly AppDbContext _db;
     private readonly ICurrentOrganization _org;
-    public ProposalDeleteModel(AppDbContext db, ICurrentOrganization org) { _db = db; _org = org; }
+    private readonly AuditService _audit;
+    public ProposalDeleteModel(AppDbContext db, ICurrentOrganization org, AuditService audit) { _db = db; _org = org; _audit = audit; }
 
     public Proposal? Proposal { get; set; }
 
@@ -37,6 +38,7 @@ public class ProposalDeleteModel : PageModel
         proposal.IsDeleted = true;
         proposal.DeletedUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+        await _audit.WriteAsync(_org.OrganizationId.Value, "Proposal", proposal.Id, "SoftDelete", new { proposal.Title });
         TempData.Success("Proposal deleted (soft). You can restore it later if needed.");
         return RedirectToPage("Index");
     }
