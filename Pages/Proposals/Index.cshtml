@@ -10,6 +10,31 @@
     <a class="btn btn-primary" asp-page="Create">New Proposal</a>
     <a class="btn btn-outline-secondary" asp-page="Archived">Archived/Deleted</a>
 </p>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="Status" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<ProposalStatus>()">
+            <option value="">All Statuses</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select asp-for="ClientId" class="form-select form-select-sm">
+            <option value="">All Clients</option>
+            @foreach (var c in Model.Clients)
+            {
+                <option value="@c.Id" selected="@(Model.ClientId == c.Id)">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <input asp-for="Search" class="form-control form-control-sm" placeholder="Search title..." />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+        <a class="btn btn-sm btn-outline-secondary" asp-page="Index">Reset</a>
+    </div>
+</form>
+
 <table class="table table-sm table-striped">
     <thead><tr><th>Title</th><th>Status</th><th>Total</th><th></th></tr></thead>
     <tbody>
@@ -37,3 +62,23 @@
     }
     </tbody>
 </table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Proposals pagination">
+        <ul class="pagination pagination-sm">
+            <li class="page-item @(Model.Page == 1 ? "disabled" : null)">
+                <a class="page-link" asp-route-Page="@(Model.Page - 1)" asp-route-Status="@Model.Status" asp-route-ClientId="@Model.ClientId" asp-route-Search="@Model.Search">Prev</a>
+            </li>
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : null)">
+                    <a class="page-link" asp-route-Page="@i" asp-route-Status="@Model.Status" asp-route-ClientId="@Model.ClientId" asp-route-Search="@Model.Search">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : null)">
+                <a class="page-link" asp-route-Page="@(Model.Page + 1)" asp-route-Status="@Model.Status" asp-route-ClientId="@Model.ClientId" asp-route-Search="@Model.Search">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
