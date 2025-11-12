@@ -5,9 +5,12 @@
     ViewData["Title"] = "Clients";
 }
 <h2>Clients</h2>
-<p><a class="btn btn-primary" asp-page="Create">New Client</a></p>
+<p>
+    <a class="btn btn-primary" asp-page="Create">New Client</a>
+    <a class="btn btn-outline-secondary" asp-page="Archived">Deleted Clients</a>
+</p>
 <table class="table table-sm table-striped">
-    <thead><tr><th>Name</th><th>Email</th><th style="width:240px"></th></tr></thead>
+    <thead><tr><th>Name</th><th>Email</th><th style="width:160px"></th></tr></thead>
     <tbody>
     @foreach (var c in Model.Clients)
     {
@@ -17,9 +20,6 @@
             <td class="d-flex gap-1">
                 <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <a asp-page="Delete" asp-route-id="@c.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                <form method="post" asp-page-handler="Restore" asp-route-id="@c.Id" class="d-inline">
-                    <button class="btn btn-sm btn-outline-success" type="submit">Restore</button>
-                </form>
             </td>
         </tr>
     }

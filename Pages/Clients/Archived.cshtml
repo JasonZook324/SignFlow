@@ -1,0 +1,35 @@
+@page
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "OrgMember")]
+@model ClientsArchivedModel
+@{
+    ViewData["Title"] = "Deleted Clients";
+}
+<h2>Deleted Clients</h2>
+<p>
+    <a class="btn btn-secondary" asp-page="Index">Back to Active</a>
+</p>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Deleted</th>
+            <th style="width:160px"></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model.Items)
+    {
+        <tr>
+            <td>@c.Name</td>
+            <td>@c.Email</td>
+            <td>@c.DeletedUtc?.ToLocalTime().ToString("g")</td>
+            <td class="d-flex gap-1">
+                <form method="post" asp-page-handler="Restore" asp-route-id="@c.Id" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-success">Restore</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
