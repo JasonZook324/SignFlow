@@ -1,0 +1,95 @@
+@page
+@model HelpModel
+@{
+    ViewData["Title"] = "Help";
+}
+<h1>Help & User Guide</h1>
+<p>Welcome to SignFlow. This guide explains how to use the system to manage clients, create proposals, handle payments, and restore deleted items.</p>
+
+<h2>1. Overview</h2>
+<p>SignFlow lets you:</p>
+<ul>
+    <li>Register and login securely.</li>
+    <li>Manage an organization and its members.</li>
+    <li>Create, edit, archive, soft delete, and restore proposals.</li>
+    <li>Create, edit, soft delete, and restore clients.</li>
+    <li>Generate proposal PDFs and send proposals for signing and payment.</li>
+    <li>Track payments via Stripe and view status changes.</li>
+    <li>See feedback via on-screen toast notifications.</li>
+</ul>
+
+<h2>2. Getting Started</h2>
+<ul>
+    <li>Register a new account on the <strong>Register</strong> page.</li>
+    <li>Login using your email and password.</li>
+    <li>Your organization context is set automatically. If you are the owner, you can manage members.</li>
+</ul>
+
+<h2>3. Clients</h2>
+<ul>
+    <li><strong>List:</strong> View active clients on the Clients page.</li>
+    <li><strong>Create:</strong> Click "New Client" and fill in required details.</li>
+    <li><strong>Edit:</strong> Use the Edit button in the list.</li>
+    <li><strong>Delete (Soft):</strong> Deleted clients move to the Deleted Clients page.</li>
+    <li><strong>Restore:</strong> Go to Deleted Clients and click Restore to reinstate.</li>
+</ul>
+
+<h2>4. Proposals</h2>
+<ul>
+    <li><strong>Create:</strong> Add a title, currency, items and client; totals are calculated.</li>
+    <li><strong>Edit:</strong> Change items or details anytime.</li>
+    <li><strong>Filter & Search:</strong> Use status, client, and keyword filters plus pagination.</li>
+    <li><strong>Archive:</strong> Move a proposal out of the active list (can unarchive).</li>
+    <li><strong>Delete (Soft):</strong> Soft-deleted proposals go to Archived/Deleted.</li>
+    <li><strong>Restore / Unarchive:</strong> Use the Archived/Deleted page to bring them back.</li>
+    <li><strong>PDF:</strong> Generate a PDF version for sharing or records.</li>
+    <li><strong>Payment:</strong> Start a payment session for a proposal; status updates after success.</li>
+</ul>
+
+<h2>5. Payments</h2>
+<ul>
+    <li>Stripe checkout sessions are created for proposals needing payment.</li>
+    <li>When payment succeeds, the proposal status updates to <em>Paid</em>.</li>
+    <li>Receipts and audit entries are recorded automatically.</li>
+</ul>
+
+<h2>6. Signing</h2>
+<ul>
+    <li>Signing tokens allow secure access to sign a proposal.</li>
+    <li>Signatures record signer name, email, time, IP and browser info.</li>
+</ul>
+
+<h2>7. Soft Deletes</h2>
+<ul>
+    <li>Clients and proposals are never removed permanently when deleted.</li>
+    <li>You can restore them from their respective Archived/Deleted pages.</li>
+</ul>
+
+<h2>8. Audit Trail</h2>
+<ul>
+    <li>Key actions (delete, restore, payment events) are logged internally.</li>
+    <li>Used for tracking and compliance; not yet exposed on a UI page.</li>
+</ul>
+
+<h2>9. Notifications</h2>
+<ul>
+    <li>Success, error, info and warning messages appear as small toasts at the top right.</li>
+    <li>They hide automatically after a few seconds.</li>
+</ul>
+
+<h2>10. Troubleshooting</h2>
+<ul>
+    <li><strong>Cannot see clients/proposals:</strong> Ensure you are logged in and part of an organization.</li>
+    <li><strong>Payment not updating:</strong> Stripe webhook must be configured correctly.</li>
+    <li><strong>Restore button missing:</strong> Check the Deleted/Archived page, not the active list.</li>
+    <li><strong>No toasts:</strong> Confirm actions triggered (e.g., form submit) and page redirected.</li>
+</ul>
+
+<h2>11. Next Steps</h2>
+<ul>
+    <li>Add proposal templates.</li>
+    <li>Enable multi-organization switching.</li>
+    <li>Expose audit log to administrators.</li>
+</ul>
+
+<p>If you need more help, contact support or check release notes for new features.</p>
