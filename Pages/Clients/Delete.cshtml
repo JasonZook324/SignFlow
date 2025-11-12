@@ -1,0 +1,19 @@
+@page
+@model ClientDeleteModel
+@{
+    ViewData["Title"] = "Delete Client";
+}
+<h2>Delete Client</h2>
+
+@if (Model.Client == null)
+{
+    <div class="alert alert-danger">Client not found.</div>
+}
+else
+{
+    <div class="alert alert-warning">Are you sure you want to delete <strong>@Model.Client.Name</strong>? This action cannot be undone.</div>
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+}

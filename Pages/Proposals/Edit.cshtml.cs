@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
+using SignFlow;
 
 [Authorize(Policy = "OrgMember")]
 public class ProposalEditModel : PageModel
@@ -73,7 +74,11 @@ public class ProposalEditModel : PageModel
         if (proposal == null) return NotFound();
         if (_org.OrganizationId == null || proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
         Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid)
+        {
+            TempData.Error("Please correct the highlighted issues.");
+            return Page();
+        }
         proposal.Title = Input.Title;
         proposal.Currency = Input.Currency;
         proposal.Subtotal = Calculation.Subtotal;
@@ -99,6 +104,7 @@ public class ProposalEditModel : PageModel
             });
         }
         await _db.SaveChangesAsync();
+        TempData.Success("Proposal updated.");
         return RedirectToPage("Index");
     }
 }

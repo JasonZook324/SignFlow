@@ -26,4 +26,8 @@ public class Proposal
     public DateTime? SignedUtc { get; set; }
     public DateTime? PaidUtc { get; set; }
     public DateTime? ExpiresUtc { get; set; }
+
+    // Soft delete fields
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedUtc { get; set; }
 }

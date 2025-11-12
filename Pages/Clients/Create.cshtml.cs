@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
+using SignFlow;
 
 [Authorize(Policy = "OrgMember")]
 public class ClientCreateModel : PageModel
@@ -29,9 +30,14 @@ public class ClientCreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid)
+        {
+            TempData.Error("Please correct the highlighted issues.");
+            return Page();
+        }
         if (_org.OrganizationId == null)
         {
+            TempData.Error("No organization context.");
             ModelState.AddModelError(string.Empty, "No organization context.");
             return Page();
         }
@@ -45,6 +51,7 @@ public class ClientCreateModel : PageModel
         };
         _db.Clients.Add(client);
         await _db.SaveChangesAsync();
+        TempData.Success("Client created.");
         return RedirectToPage("Index");
     }
 }

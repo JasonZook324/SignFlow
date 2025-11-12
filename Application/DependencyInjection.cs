@@ -17,8 +17,8 @@ public static class DependencyInjection
         services.AddScoped<CurrentOrganization>();
         services.AddScoped<ICurrentOrganization>(sp => sp.GetRequiredService<CurrentOrganization>());
 
-        services.AddSingleton<IAuthorizationHandler, OrgMemberAuthorizationHandler>();
-        services.AddSingleton<IAuthorizationHandler, OrgOwnerAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, OrgMemberAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, OrgOwnerAuthorizationHandler>();
         services.AddAuthorization(options =>
         {
             options.AddPolicy("OrgMember", policy => policy.Requirements.Add(new OrgMemberRequirement()));

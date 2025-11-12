@@ -38,6 +38,45 @@
             <small>&copy; @DateTime.Now.Year - SignFlow</small>
         </footer>
     </div>
+
+    <!-- Toast container (top-right) -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        @{
+            var messages = new List<(string Key, string Css)>
+            {
+                ("StatusMessage", "text-bg-success"),
+                ("ErrorMessage", "text-bg-danger"),
+                ("InfoMessage", "text-bg-info"),
+                ("WarningMessage", "text-bg-warning")
+            };
+        }
+        @foreach (var tuple in messages)
+        {
+            if (TempData[tuple.Key] is string m && !string.IsNullOrWhiteSpace(m))
+            {
+                <div class="toast align-items-center @tuple.Css border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+                    <div class="d-flex">
+                        <div class="toast-body">@m</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Bootstrap JS (bundle includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.forEach(function (toastEl) {
+                var toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+                toast.show();
+            });
+        });
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

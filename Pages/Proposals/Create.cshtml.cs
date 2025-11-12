@@ -6,6 +6,7 @@ using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
 using Microsoft.EntityFrameworkCore;
+using SignFlow;
 
 [Authorize(Policy = "OrgMember")]
 public class ProposalCreateModel : PageModel
@@ -50,6 +51,7 @@ public class ProposalCreateModel : PageModel
     {
         if (_org.OrganizationId == null)
         {
+            TempData.Error("No organization context.");
             ModelState.AddModelError(string.Empty, "No organization context.");
             return Page();
         }
@@ -62,12 +64,17 @@ public class ProposalCreateModel : PageModel
     {
         if (_org.OrganizationId == null)
         {
+            TempData.Error("No organization context.");
             ModelState.AddModelError(string.Empty, "No organization context.");
             return Page();
         }
         AvailableClients = await _db.Clients.Where(c => c.OrganizationId == _org.OrganizationId).OrderBy(c => c.Name).ToListAsync();
         Calculation = _pricing.Calculate(Input.Items.Select(i => (i.Quantity, i.UnitPrice, i.Taxable, i.DiscountRate)), Input.TaxRate / 100m);
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid)
+        {
+            TempData.Error("Please correct the highlighted issues.");
+            return Page();
+        }
 
         var proposal = new Proposal
         {
@@ -100,6 +107,7 @@ public class ProposalCreateModel : PageModel
             });
         }
         await _db.SaveChangesAsync();
+        TempData.Success("Proposal created.");
         return RedirectToPage("Index");
     }
 }

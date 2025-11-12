@@ -8,4 +8,8 @@ public class Client
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public string? ExternalRef { get; set; }
+
+    // Soft delete fields
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedUtc { get; set; }
 }

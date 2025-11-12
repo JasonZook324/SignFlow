@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SignFlow.Domain.Entities;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Application.Services;
+using SignFlow;
 
 [Authorize(Policy = "OrgMember")]
 public class ClientEditModel : PageModel
@@ -38,12 +39,17 @@ public class ClientEditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid)
+        {
+            TempData.Error("Please correct the highlighted issues.");
+            return Page();
+        }
         var c = await _db.Clients.FirstOrDefaultAsync(x => x.Id == Input.Id);
         if (c == null) return NotFound();
         if (_org.OrganizationId == null || c.OrganizationId != _org.OrganizationId.Value) return Forbid();
         c.Name = Input.Name; c.Email = Input.Email; c.Phone = Input.Phone;
         await _db.SaveChangesAsync();
+        TempData.Success("Client updated.");
         return RedirectToPage("Index");
     }
 }

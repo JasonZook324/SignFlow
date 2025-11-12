@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SignFlow;
 
 public class RegisterModel : PageModel
 {
@@ -31,16 +32,28 @@ public class RegisterModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid)
+        {
+            TempData.Error("Please correct the highlighted issues.");
+            return Page();
+        }
         var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
         var result = await _userManager.CreateAsync(user, Input.Password);
         if (result.Succeeded)
         {
             await _signInManager.SignInAsync(user, isPersistent: false);
+            TempData.Success("Account created successfully. You are now signed in.");
             return RedirectToPage("/Index");
         }
+        bool passwordIssue = false;
         foreach (var error in result.Errors)
+        {
+            if (error.Code.StartsWith("Password", System.StringComparison.OrdinalIgnoreCase)) passwordIssue = true;
             ModelState.AddModelError(string.Empty, error.Description);
+        }
+        TempData.Error(passwordIssue
+            ? "Password requirements: at least 8 characters, include a number."
+            : "Registration failed. Please review errors.");
         return Page();
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SignFlow.Infrastructure.Persistence;
 using SignFlow.Domain.Entities;
 using SignFlow.Application.Services;
+using SignFlow;
 
 [Authorize(Policy = "OrgOwner")]
 public class ProposalDeleteModel : PageModel
@@ -17,7 +18,7 @@ public class ProposalDeleteModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
-        Proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
+        Proposal = await _db.Proposals.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
         if (Proposal == null) return NotFound();
         if (_org.OrganizationId == null || Proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
         return Page();
@@ -25,13 +26,18 @@ public class ProposalDeleteModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(Guid id)
     {
-        var proposal = await _db.Proposals.FirstOrDefaultAsync(p => p.Id == id);
+        var proposal = await _db.Proposals.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
         if (proposal == null) return NotFound();
         if (_org.OrganizationId == null || proposal.OrganizationId != _org.OrganizationId.Value) return Forbid();
-        var items = _db.ProposalItems.Where(i => i.ProposalId == id);
-        _db.ProposalItems.RemoveRange(items);
-        _db.Proposals.Remove(proposal);
+        if (proposal.IsDeleted)
+        {
+            TempData.Info("Proposal already deleted.");
+            return RedirectToPage("Index");
+        }
+        proposal.IsDeleted = true;
+        proposal.DeletedUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+        TempData.Success("Proposal deleted (soft). You can restore it later if needed.");
         return RedirectToPage("Index");
     }
 }

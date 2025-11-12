@@ -5,13 +5,18 @@
     ViewData["Title"] = "Delete Proposal";
 }
 <h2>Delete Proposal</h2>
-@if (Model.Proposal != null)
+
+@if (Model.Proposal == null)
+{
+    <div class="alert alert-danger">Proposal not found.</div>
+}
+else
 {
     <div class="alert alert-warning">
-        Are you sure you want to delete proposal <strong>@Model.Proposal.Title</strong>?
+        Are you sure you want to delete <strong>@Model.Proposal.Title</strong>? This action can be undone.
     </div>
     <form method="post">
         <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-page="View" asp-route-id="@Model.Proposal.Id" class="btn btn-secondary">Cancel</a>
+        <a asp-page="Index" class="btn btn-secondary">Cancel</a>
     </form>
 }

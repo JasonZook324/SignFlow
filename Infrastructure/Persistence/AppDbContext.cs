@@ -13,7 +13,6 @@ public class AppDbContext : IdentityDbContext
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Proposal> Proposals => Set<Proposal>();
     public DbSet<ProposalItem> ProposalItems => Set<ProposalItem>();
-    public DbSet<ProposalTemplate> ProposalTemplates => Set<ProposalTemplate>();
     public DbSet<Signature> Signatures => Set<Signature>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
@@ -27,5 +26,9 @@ public class AppDbContext : IdentityDbContext
         modelBuilder.Entity<Client>().HasIndex(c => new { c.OrganizationId, c.Name });
         modelBuilder.Entity<Payment>().HasIndex(p => p.ProposalId);
         modelBuilder.Entity<SigningToken>().HasIndex(t => t.Token).IsUnique();
+
+        // Global query filters for soft-deletes
+        modelBuilder.Entity<Client>().HasQueryFilter(c => !c.IsDeleted);
+        modelBuilder.Entity<Proposal>().HasQueryFilter(p => !p.IsDeleted);
     }
 }
